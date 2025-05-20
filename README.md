@@ -13,9 +13,9 @@ Users can select their age group (Toddler, Child, Adult) to receive a tailored q
 
 - 📊 Machine Learning Algorithms  
 Implements multiple ML models such as:
-- Random Forest
-- Decision Tree
-- XGBoost  
+   - Random Forest
+   - Decision Tree
+   - XGBoost  
 Each model is trained on age-specific balanced and cleaned datasets to ensure reliable predictions.
 
 - 🧠 Autism-Specific Questionnaire  
