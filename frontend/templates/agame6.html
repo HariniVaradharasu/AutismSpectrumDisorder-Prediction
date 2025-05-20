@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Sorting Speed Test</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: rgba(134, 100, 214, 0.63);
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        .screen {
+            display: none;
+            margin-top: 50px;
+        }
+        #instructions {
+            display: block;
+        }
+        .container {
+            margin: 20px auto;
+            width: 350px;
+            padding: 20px;
+            background: white;
+            border: 2px solid black;
+            border-radius: 10px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        #game-container {
+            display: none;
+        }
+        #number-list {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .number {
+            width: 50px;
+            height: 50px;
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid black;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+        .number:hover {
+            background-color: #4CAF50;
+            color: white;
+            transform: scale(1.1);
+        }
+        .number.correct {
+            background-color: #28a745;
+            color: white;
+        }
+        .number.wrong {
+            background-color: red;
+            color: white;
+            animation: shake 0.2s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        #timer {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Instruction Screen -->
+    <div id="instructions" class="screen">
+        <div class="container">
+            <h2>Welcome to Number Sorting Speed Test</h2>
+            <p>Instructions:</p>
+            <ul style="text-align: left;">
+                <li>You will see a set of random numbers.</li>
+                <li>Click them in ascending order as fast as possible.</li>
+                <li>The faster you finish, the better your score!</li>
+            </ul>
+            <button class="btn" onclick="showScreen('level-selection')">Next</button>
+        </div>
+    </div>
+
+    <!-- Level Selection Screen -->
+    <div id="level-selection" class="screen">
+        <div class="container">
+            <h2>Select Difficulty</h2>
+            <select id="difficulty">
+                <option value="10">Easy (10 Numbers)</option>
+                <option value="20">Medium (20 Numbers)</option>
+                <option value="30">Hard (30 Numbers)</option>
+            </select><br>
+            <button class="btn" onclick="startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="container">
+            <h2>Number Sorting Speed Test</h2>
+            <div id="timer">Time: 0s</div>
+            <div id="game-container">
+                <div id="number-list"></div>
+            </div>
+            <p id="message"></p>
+            <button class="btn" onclick="restartGame()" style="display: none;" id="restart-btn">Play Again</button>
+            <h3>Best Time: <span id="bestTime">--</span> seconds</h3>
+        </div>
+    </div>
+
+    <script>
+        let numbers = [];
+        let currentIndex = 1;
+        let startTime;
+        let timerInterval;
+        let bestTime = parseFloat(localStorage.getItem("bestTime")) || null;
+        document.getElementById("bestTime").textContent = bestTime ? bestTime.toFixed(2) : "--";
+
+        function showScreen(screenId) {
+            document.querySelectorAll(".screen").forEach(screen => {
+                screen.style.display = "none";
+            });
+            document.getElementById(screenId).style.display = "block";
+        }
+
+        function startGame() {
+            let numCount = parseInt(document.getElementById("difficulty").value);
+            numbers = Array.from({ length: numCount }, (_, i) => i + 1);
+            numbers.sort(() => Math.random() - 0.5);
+            currentIndex = 1;
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 100);
+            document.getElementById("timer").style.display = "block";
+            document.getElementById("game-container").style.display = "block";
+            document.getElementById("restart-btn").style.display = "none";
+            document.getElementById("message").innerText = "";
+            showScreen('game-screen');
+            renderNumbers();
+        }
+
+        function renderNumbers() {
+            const numberList = document.getElementById("number-list");
+            numberList.innerHTML = "";
+            numbers.forEach(num => {
+                const div = document.createElement("div");
+                div.classList.add("number");
+                div.innerText = num;
+                div.addEventListener("click", () => checkNumber(num, div));
+                numberList.appendChild(div);
+            });
+        }
+
+        function checkNumber(num, element) {
+            if (num === currentIndex) {
+                element.classList.add("correct");
+                setTimeout(() => element.style.visibility = "hidden", 300);
+                currentIndex++;
+                if (currentIndex > numbers.length) {
+                    clearInterval(timerInterval);
+                    let timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
+                    document.getElementById("message").innerText = `🎉 Well done! You finished in ${timeTaken} seconds!`;
+                    document.getElementById("restart-btn").style.display = "block";
+                    updateBestTime(timeTaken);
+                }
+            } else {
+                element.classList.add("wrong");
+                setTimeout(() => element.classList.remove("wrong"), 300);
+            }
+        }
+
+        function updateTimer() {
+            document.getElementById("timer").innerText = `Time: ${((Date.now() - startTime) / 1000).toFixed(2)}s`;
+        }
+
+        function updateBestTime(timeTaken) {
+            if (!bestTime || parseFloat(timeTaken) < bestTime) {
+                bestTime = parseFloat(timeTaken);
+                localStorage.setItem("bestTime", bestTime);
+                document.getElementById("bestTime").textContent = bestTime.toFixed(2);
+            }
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+
+</body>
+</html>
+

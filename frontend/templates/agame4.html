@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Memory Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #333;
+            padding: 20px;
+            background-color:rgba(237, 86, 237, 0.48);
+        }
+
+        #game-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden initially */
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        #instruction-box {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 1.1em;
+            text-align: left;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        #instruction-box h2 {
+            color: #ff5733;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        #instruction-box ul {
+            padding-left: 20px;
+        }
+
+        #instruction-box li {
+            margin-bottom: 8px;
+        }
+
+        #start-btn {
+            padding: 12px 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        #start-btn:hover {
+            background: #218838;
+        }
+
+        #level-display, #high-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #number-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            color: #ff5733;
+        }
+
+        #input-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 1.2em;
+            text-align: center;
+            width: 220px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 1em;
+            margin-top: 10px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        #message {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .back-btn-top {
+            background-color: green;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Number Memory Test</h1>
+
+    <div id="instruction-box">
+        <h2>How to Play:</h2>
+        <ul>
+            <li>A number will be displayed on the screen for a few seconds.</li>
+            <li>Memorize the number as quickly as possible.</li>
+            <li>After the number disappears, enter the exact number in the input box.</li>
+            <li>If you enter the correct number, you proceed to the next level.</li>
+            <li>The game gets harder as the number length increases!</li>
+        </ul>
+        <p>Click the "Start Game" button when you're ready.</p>
+    </div>
+
+    <button onclick="startGame()" id="start-btn">Start Game</button>
+
+    <div id="game-container">
+        <div id="level-display">Level: <span id="level">1</span></div>
+        <div id="high-score">High Score: <span id="high-score-value">0</span></div>
+        <div id="number-display"></div>
+        <div id="input-section">
+            <input type="text" id="user-input" placeholder="Enter number" onkeypress="handleEnter(event)">
+            <br>
+            <button onclick="checkNumber()">Submit</button>
+        </div>
+        <p id="message"></p>
+    </div>
+
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 Back</button>
+    </div>
+
+    <audio id="success-sound" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
+    <audio id="failure-sound" src="https://www.fesliyanstudios.com/play-mp3/497"></audio>
+
+    <script>
+        let level = 1;
+        let currentNumber = "";
+        let highScore = localStorage.getItem("highScore") || 0;
+        document.getElementById("high-score-value").innerText = highScore;
+
+        function startGame() {
+            level = 1;
+            document.getElementById("start-btn").style.display = "none";
+            document.getElementById("instruction-box").style.display = "none"; 
+            document.getElementById("game-container").style.display = "block";
+            document.getElementById("message").innerText = "";
+            document.getElementById("level").innerText = level;
+            nextLevel();
+        }
+
+        function nextLevel() {
+            document.getElementById("input-section").style.opacity = "0";
+            document.getElementById("input-section").style.display = "none";
+            document.getElementById("user-input").value = "";
+            document.getElementById("level").innerText = level;
+
+            currentNumber = generateNumber(level);
+            document.getElementById("number-display").innerText = currentNumber;
+            document.getElementById("number-display").style.opacity = "1";
+
+            let displayTime = Math.max(2000 - level * 100, 800);
+            setTimeout(() => {
+                document.getElementById("number-display").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("number-display").innerText = "";
+                    document.getElementById("input-section").style.display = "block";
+                    setTimeout(() => document.getElementById("input-section").style.opacity = "1", 100);
+                    document.getElementById("user-input").focus();
+                }, 500);
+            }, displayTime);
+        }
+
+        function generateNumber(length) {
+            let num = "";
+            for (let i = 0; i < length; i++) {
+                num += Math.floor(Math.random() * 10);
+            }
+            return num;
+        }
+
+        function checkNumber() {
+            let userInput = document.getElementById("user-input").value;
+            if (userInput === currentNumber) {
+                document.getElementById("message").innerText = "✅ Correct! Next Level...";
+                document.getElementById("success-sound").play();
+                level++;
+                setTimeout(nextLevel, 1000);
+            } else {
+                document.getElementById("message").innerText = `❌ Incorrect! Try again.`;
+                document.getElementById("failure-sound").play();
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+</body>
+</html>

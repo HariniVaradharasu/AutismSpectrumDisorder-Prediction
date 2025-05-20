@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Maze Game</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: rgb(205, 190, 224);
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+        h2 {
+            margin-bottom: 5px;
+        }
+        #instructions {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        #maze-container {
+            display: none;
+        }
+        #maze {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+            margin: 20px auto;
+            background-color: black;
+            padding: 5px;
+            width: max-content;
+            border-radius: 10px;
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        .wall { background-color: #333; }
+        .player { background-color: #007bff; }
+        .goal { background-color: #28a745; }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background: #ff5733;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover { background: #e04e2a; }
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .back-btn-top {
+            background-color: green;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            
+    </style>
+</head>
+<body>
+    <h2>Interactive Maze Game</h2>
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 Back</button>
+    </div>
+    
+    <div id="instructions">
+        <h3>Game Instructions</h3>
+        <p>Welcome to the Interactive Maze Game! Your goal is to navigate the blue player through the maze and reach the green goal.</p>
+        <h4>Rules:</h4>
+        <ul>
+            <li>Use the arrow keys to move the player.</li>
+            <li>Avoid walls; you cannot pass through them.</li>
+            <li>You must reach the goal within 30 seconds.</li>
+            <li>If time runs out, you will have to restart the game.</li>
+        </ul>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    
+    <div id="maze-container">
+        <div id="maze"></div>
+        <p id="message"></p>
+        <div id="controls">
+            <button onclick="restartGame()">Restart</button>
+            <button onclick="toggleTimer()">Pause</button>
+            <p>Moves: <span id="moves">0</span> | Time Left: <span id="timer">30</span> seconds</p>
+        </div>
+    </div>
+    
+    <script>
+        const mazeLayout = [
+            "##########",
+            "#P       #",
+            "# ##### ##",
+            "# #      #",
+            "# # #### #",
+            "# # #  # #",
+            "#   # ## #",
+            "### #    #",
+            "#     ####",
+            "#G########"
+        ];
+
+        let playerPosition = { x: 1, y: 1 };
+        let goalPosition = { x: 1, y: 1 };
+        let moves = 0;
+        let timeLeft = 30;
+        let timer;
+        let isPaused = false;
+
+        function startGame() {
+            document.getElementById("instructions").style.display = "none";
+            document.getElementById("maze-container").style.display = "block";
+            generateMaze();
+            restartGame();
+        }
+
+        function generateMaze() {
+            const mazeElement = document.getElementById("maze");
+            mazeElement.innerHTML = "";
+            mazeLayout.forEach((row, y) => {
+                row.split('').forEach((cell, x) => {
+                    const div = document.createElement("div");
+                    div.classList.add("cell");
+                    if (cell === "#") div.classList.add("wall");
+                    if (cell === "P") {
+                        div.classList.add("player");
+                        playerPosition = { x, y };
+                    }
+                    if (cell === "G") {
+                        div.classList.add("goal");
+                        goalPosition = { x, y };
+                    }
+                    div.dataset.x = x;
+                    div.dataset.y = y;
+                    mazeElement.appendChild(div);
+                });
+            });
+        }
+
+        function movePlayer(dx, dy) {
+            if (isPaused) return;
+            const newX = playerPosition.x + dx;
+            const newY = playerPosition.y + dy;
+            if (mazeLayout[newY][newX] !== "#") {
+                playerPosition = { x: newX, y: newY };
+                moves++;
+                document.getElementById("moves").innerText = moves;
+                updateMaze();
+                checkWin();
+            }
+        }
+
+        function updateMaze() {
+            document.querySelectorAll(".player").forEach(e => e.classList.remove("player"));
+            document.querySelector(`[data-x='${playerPosition.x}'][data-y='${playerPosition.y}']`).classList.add("player");
+        }
+
+        function checkWin() {
+            if (playerPosition.x === goalPosition.x && playerPosition.y === goalPosition.y) {
+                clearInterval(timer);
+                document.getElementById("message").innerText = "You Win!";
+            }
+        }
+
+        function restartGame() {
+            moves = 0;
+            timeLeft = 30;
+            document.getElementById("moves").innerText = moves;
+            document.getElementById("timer").innerText = timeLeft;
+            document.getElementById("message").innerText = "";
+            generateMaze();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (!isPaused && timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById("timer").innerText = timeLeft;
+                } else if (timeLeft === 0) {
+                    clearInterval(timer);
+                    document.getElementById("message").innerText = "Time's up! Try again.";
+                }
+            }, 1000);
+        }
+
+        function toggleTimer() {
+            isPaused = !isPaused;
+        }
+
+        function goBack() {
+            window.history.back(); // Navigate to the previous page in history
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp") movePlayer(0, -1);
+            if (event.key === "ArrowDown") movePlayer(0, 1);
+            if (event.key === "ArrowLeft") movePlayer(-1, 0);
+            if (event.key === "ArrowRight") movePlayer(1, 0);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Runner Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: radial-gradient(circle, #0e0b16, #1a1a2e);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: #ff6f61;
+            text-shadow: 3px 3px 5px black;
+            margin-bottom: 20px;
+        }
+
+        .maze-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            background: #0f3460;
+            border: 5px solid #ff6f61;
+            border-radius: 20px;
+            box-shadow: 0 0 15px #ff6f61;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 2px;
+        }
+
+        .cell {
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+        }
+
+        .wall {
+            background: #ff6f61;
+        }
+
+        .player {
+            background: #28a745;
+            transition: transform 0.2s ease;
+        }
+
+        .goal {
+            background: #ffc107;
+        }
+
+        .info {
+            margin-top: 20px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .game-over {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .btn-container {
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            margin: 5px;
+            background: #28a745;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .back-btn-top {
+            background-color:  #0e0b16;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            
+    </style>
+</head>
+<body>
+    <h1>Maze Runner Game</h1>
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 Back</button>
+    </div>
+
+    <div class="maze-container" id="maze"></div>
+    <div class="info" id="timer">Time Left: 30s</div>
+    <div class="game-over" id="gameOver">Game Over!</div>
+    <div class="btn-container">
+        <button class="btn" id="startBtn">Start Game</button>
+        <button class="btn" id="restartBtn">Restart Game</button>
+    </div>
+
+    <script>
+        const mazeElement = document.getElementById('maze');
+        const timerDisplay = document.getElementById('timer');
+        const gameOverDisplay = document.getElementById('gameOver');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        let maze = [];
+        let playerPosition = { x: 0, y: 0 };
+        let gameActive = false;
+        let timeLeft = 30;
+        let timerInterval;
+
+        const mazeLayout = [
+            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
+            [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+            [1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+            [0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+            [0, 1, 0, 1, 1, 1, 0, 1, 1, 0],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 1, 0, 1, 1, 1, 1, 0]
+        ];
+
+        function drawMaze() {
+            mazeElement.innerHTML = '';
+            maze = [];
+            mazeLayout.forEach((row, y) => {
+                maze[y] = [];
+                row.forEach((cell, x) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.classList.add('cell');
+                    if (cell === 1) cellDiv.classList.add('wall');
+                    if (x === 0 && y === 0) cellDiv.classList.add('player');
+                    if (x === 9 && y === 9) cellDiv.classList.add('goal');
+                    mazeElement.appendChild(cellDiv);
+                    maze[y][x] = cellDiv;
+                });
+            });
+        }
+
+        function movePlayer(dx, dy) {
+            if (!gameActive) return;
+            const newX = playerPosition.x + dx;
+            const newY = playerPosition.y + dy;
+            if (
+                newX >= 0 && newX < 10 &&
+                newY >= 0 && newY < 10 &&
+                mazeLayout[newY][newX] === 0
+            ) {
+                maze[playerPosition.y][playerPosition.x].classList.remove('player');
+                playerPosition = { x: newX, y: newY };
+                maze[newY][newX].classList.add('player');
+                checkWin();
+            }
+        }
+
+        function checkWin() {
+            if (playerPosition.x === 9 && playerPosition.y === 9) {
+                clearInterval(timerInterval);
+                gameOverDisplay.textContent = "You Win!";
+                gameOverDisplay.style.display = 'block';
+                gameActive = false;
+            }
+        }
+
+        function startGame() {
+            drawMaze();
+            playerPosition = { x: 0, y: 0 };
+            timeLeft = 30;
+            gameActive = true;
+            gameOverDisplay.style.display = 'none';
+            timerDisplay.textContent = 'Time Left: 30s';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    gameOverDisplay.textContent = "Game Over!";
+                    gameOverDisplay.style.display = 'block';
+                    gameActive = false;
+                }
+            }, 1000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            switch (e.key) {
+                case 'ArrowUp': movePlayer(0, -1); break;
+                case 'ArrowDown': movePlayer(0, 1); break;
+                case 'ArrowLeft': movePlayer(-1, 0); break;
+                case 'ArrowRight': movePlayer(1, 0); break;
+            }
+        });
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+        function goBack() {
+            window.history.back(); // Navigate to the previous page in history
+        }
+    </script>
+</body>
+</html>

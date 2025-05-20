@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumping Square Enhanced</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #83a4d4, #b6fbff);
+        }
+        .game-container {
+            position: relative;
+            width: 650px;
+            height: 300px;
+            border: 3px solid #333;
+            margin: 20px auto;
+            background-color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .square {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: red;
+            bottom: 0;
+            left: 50px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .obstacle {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background-color: black;
+            bottom: 0;
+            right: -30px;
+        }
+        @keyframes moveObstacle {
+            from { right: -30px; }
+            to { right: 100%; }
+        }
+        .lives {
+            font-size: 20px;
+            margin: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .back-btn-top {
+            background-color: skyblue;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            
+    </style>
+</head>
+<body>
+    <h1>Jumping Square Enhanced</h1>
+    <p>Press Space to jump over obstacles!</p>
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 BACK </button>
+    </div>
+    <div class="lives">Lives: <span id="lives">3</span></div>
+    <div class="game-container">
+        <div class="square" id="square"></div>
+    </div>
+    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
+    <button class="btn" id="pauseResumeBtn" onclick="togglePause()" disabled>Pause</button>
+    <button class="btn" onclick="restartGame()" disabled>Restart Game</button>
+
+    <audio id="jumpSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <audio id="hitSound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
+
+    <script>
+        const gameContainer = document.querySelector(".game-container");
+        const square = document.getElementById("square");
+        const livesDisplay = document.getElementById("lives");
+        const jumpSound = document.getElementById("jumpSound");
+        const hitSound = document.getElementById("hitSound");
+        const pauseResumeBtn = document.getElementById("pauseResumeBtn");
+        const startBtn = document.getElementById("startBtn");
+        const restartBtn = document.querySelector("button[onclick='restartGame()']");
+        let isJumping = false;
+        let lives = 3;
+        let gameOver = false;
+        let obstacleSpeed = 2000;
+        let gamePaused = false;
+        let gameStarted = false;
+        let obstacleInterval;
+        let obstacles = [];
+
+        function jump() {
+            if (isJumping || gameOver || gamePaused || !gameStarted) return;
+            jumpSound.play();
+            isJumping = true;
+            let position = 0;
+            let upInterval = setInterval(() => {
+                if (position >= 100) {
+                    clearInterval(upInterval);
+                    let downInterval = setInterval(() => {
+                        if (position <= 0) {
+                            clearInterval(downInterval);
+                            isJumping = false;
+                        }
+                        position -= 5;
+                        square.style.bottom = position + "px";
+                    }, 20);
+                }
+                position += 5;
+                square.style.bottom = position + "px";
+            }, 20);
+        }
+
+        function createObstacle() {
+            if (gameOver || gamePaused || !gameStarted) return;
+            const obstacle = document.createElement("div");
+            obstacle.classList.add("obstacle");
+            gameContainer.appendChild(obstacle);
+            obstacle.style.animation = `moveObstacle ${obstacleSpeed / 1000}s linear`;
+            obstacles.push(obstacle);
+
+            let moveInterval = setInterval(() => {
+                if (gameOver || gamePaused || !gameStarted) {
+                    clearInterval(moveInterval);
+                    return;
+                }
+                const squareRect = square.getBoundingClientRect();
+                const obstacleRect = obstacle.getBoundingClientRect();
+                if (
+                    squareRect.bottom > obstacleRect.top &&
+                    squareRect.right > obstacleRect.left &&
+                    squareRect.left < obstacleRect.right &&
+                    squareRect.top < obstacleRect.bottom
+                ) {
+                    hitSound.play();
+                    lives--;
+                    livesDisplay.textContent = lives;
+                    obstacle.remove();
+                    obstacles = obstacles.filter(obs => obs !== obstacle);
+                    if (lives === 0) {
+                        alert("Game Over! Try Again.");
+                        gameOver = true;
+                    }
+                    clearInterval(moveInterval);
+                }
+            }, 50);
+        }
+
+        function startObstacles() {
+            obstacleInterval = setInterval(createObstacle, obstacleSpeed);
+        }
+
+        function togglePause() {
+            gamePaused = !gamePaused;
+            if (gamePaused) {
+                clearInterval(obstacleInterval);
+                obstacles.forEach(obstacle => {
+                    obstacle.style.animationPlayState = "paused";
+                });
+                pauseResumeBtn.textContent = "Resume";
+            } else {
+                obstacles.forEach(obstacle => {
+                    obstacle.style.animationPlayState = "running";
+                });
+                startObstacles();
+                pauseResumeBtn.textContent = "Pause";
+            }
+        }
+
+        function restartGame() {
+            lives = 3;
+            obstacleSpeed = 2000;
+            gameOver = false;
+            gamePaused = false;
+            gameStarted = true;
+            livesDisplay.textContent = lives;
+            pauseResumeBtn.textContent = "Pause";
+            pauseResumeBtn.disabled = false;
+            restartBtn.disabled = false;
+            obstacles.forEach(obstacle => obstacle.remove());
+            obstacles = [];
+            clearInterval(obstacleInterval);
+            startObstacles();
+        }
+
+        function startGame() {
+            gameStarted = true;
+            startObstacles();
+            startBtn.disabled = true;
+            pauseResumeBtn.disabled = false;
+            restartBtn.disabled = false;
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "Space") {
+                jump();
+            }
+        });
+
+        function goBack() {
+            window.history.back(); // Navigate to the previous page in history
+        }
+    </script>
+</body>
+</html>

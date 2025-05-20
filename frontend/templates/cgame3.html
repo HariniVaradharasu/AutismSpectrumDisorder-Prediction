@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Scramble Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            animation: moveBackground 10s infinite alternate ease-in-out;
+        }
+        @keyframes moveBackground {
+            0% { background-position: left; }
+            100% { background-position: right; }
+        }
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .container:hover { transform: scale(1.05); }
+        .hidden { display: none; }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover { background-color: #0056b3; transform: scale(1.1); }
+        .message { font-weight: bold; margin-top: 10px; }
+        .lives { color: red; font-size: 18px; }
+        .score, .timer { font-size: 18px; }
+
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .back-btn-top {
+            background-color: green;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            
+
+
+    </style>
+</head>
+<body>
+    <div id="start-screen" class="container">
+        <h2>Welcome to the Word Scramble Game!</h2>
+        <p>Instructions: Unscramble the given word within 30 seconds. You have 3 lives. Good luck!</p>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 Back</button>
+    </div>
+    
+    <div id="game-container" class="container hidden">
+        <h2>Word Scramble Game</h2>
+        <h3 id="scrambled-word"></h3>
+        <p class="timer">Time Left: <span id="timer">30</span>s</p>
+        <p class="lives">Lives: <span id="lives">3</span></p>
+        <input type="text" id="user-input" placeholder="Enter the correct word">
+        <button onclick="checkWord()">Submit</button>
+        <button onclick="getHint()">Hint</button>
+        <button onclick="shuffleWord()">Shuffle</button>
+        <button onclick="newWord()">Next Word</button>
+        <p class="message" id="message"></p>
+        <p class="score">Score: <span id="score">0</span></p>
+        <p>High Score: <span id="high-score">0</span></p>
+    </div>
+
+    <script>
+        const words = ["APPLE", "MANGO", "BANANA", "ORANGE", "PINEAPPLE", "STRAWBERRY", "WATERMELON"];
+        let currentWord = "";
+        let score = 0;
+        let lives = 3;
+        let timeLeft = 30;
+        let timer;
+
+        function startGame() {
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("game-container").classList.remove("hidden");
+            newWord();
+        }
+
+        function scramble(word) {
+            return word.split('').sort(() => Math.random() - 0.5).join('');
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            document.getElementById("timer").textContent = timeLeft;
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById("timer").textContent = timeLeft;
+                } else {
+                    clearInterval(timer);
+                    loseLife();
+                }
+            }, 1000);
+        }
+
+        function newWord() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById("scrambled-word").textContent = scramble(currentWord);
+            document.getElementById("message").textContent = "";
+            document.getElementById("user-input").value = "";
+            startTimer();
+        }
+
+        function checkWord() {
+            let userInput = document.getElementById("user-input").value.trim().toUpperCase();
+            let message = document.getElementById("message");
+            if (userInput === currentWord) {
+                message.style.color = "green";
+                message.textContent = "Correct!";
+                score++;
+                document.getElementById("score").textContent = score;
+                updateHighScore();
+                newWord();
+            } else {
+                message.style.color = "red";
+                message.textContent = "Try again!";
+                loseLife();
+            }
+            document.getElementById("user-input").value = "";
+        }
+
+        function getHint() {
+            let revealedLetters = Math.ceil(currentWord.length / 3);
+            let hint = currentWord.substring(0, revealedLetters) + "...";
+            document.getElementById("message").textContent = "Hint: " + hint;
+        }
+
+        function shuffleWord() {
+            document.getElementById("scrambled-word").textContent = scramble(currentWord);
+        }
+
+        function updateHighScore() {
+            let highScore = localStorage.getItem("highScore") || 0;
+            if (score > highScore) {
+                localStorage.setItem("highScore", score);
+                document.getElementById("high-score").textContent = score;
+            }
+        }
+
+        function loseLife() {
+            lives--;
+            document.getElementById("lives").textContent = lives;
+            if (lives === 0) {
+                alert("Game Over! Your final score: " + score);
+                location.reload();
+            } else {
+                newWord();
+            }
+        }
+
+
+        function goBack() {
+            window.history.back(); // Navigate to the previous page in history
+        }
+
+
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") checkWord();
+        });
+
+        document.getElementById("high-score").textContent = localStorage.getItem("highScore") || 0;
+    </script>
+</body>
+</html>

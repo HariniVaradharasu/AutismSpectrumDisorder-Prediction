@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Autism Detection</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg,rgba(20, 236, 228, 0.83),rgb(159, 252, 218));
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background:rgb(240, 79, 5);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background:rgb(241, 71, 9);
+        }
+    </style>
+</head>
+<body>
+    <h2>Child Autism Detection Form</h2>
+    <form action="/predictc" method="post">
+        <div class="container">
+            <div class="form-group">
+                <label>Age:</label>
+                <input type="number" name="age" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Gender:</label>
+                <select name="gender" required>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Ethnicity:</label>
+                <select name="ethnicity" required>
+                    <option value="0">Asian</option>
+                    <option value="1">Black</option>
+                    <option value="2">Hispanic</option>
+                    <option value="3">Latino</option>
+                    <option value="9">White-European</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Jaundice:</label>
+                <select name="jundice" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Relation:</label>
+                <select name="relation" required>
+                    <option value="0">Health care professional</option>
+                    <option value="1">Parent</option>
+                    <option value="2">Relative</option>
+                    <option value="3">Self</option>
+                    <option value="4">self</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Used Screening App Before:</label>
+                <select name="used_app_before" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>    
+            <h3>Autism Screening Questions:</h3>
+            <div class="form-group"><label>Q1. Does your child speak very little and give unrelated answers to questions?</label>
+                <select name="A1_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q2. Does your child not respond to their name or avoid eye contact?</label>
+                <select name="A2_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q3. Does your child not engage in games of pretend with other children?</label>
+                <select name="A3_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q4. Does your child struggle to understand other people’s feelings?</label>
+                <select name="A4_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q5. Is your child easily upset by small changes?</label>
+                <select name="A5_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q6. Does your child have obsessive interests?</label>
+                <select name="A6_Score" required><option value="1">Yes</option><option value="0">No</option></select></div> 
+            <div class="form-group"><label>Q7. Is your child over or under-sensitive to smells, tastes, or touch?</label>
+                <select name="A7_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q8. Does your child struggle to socialize with other children?</label>
+                <select name="A8_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q9. Does your child avoid physical contact?</label>
+                <select name="A9_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <div class="form-group"><label>Q10. Does your child show little awareness of dangerous situations?</label>
+                <select name="A10_Score" required><option value="1">Yes</option><option value="0">No</option></select></div>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="history.back()" style="margin-top: 10px; background:rgb(16, 34, 241);">Back</button>
+        </div>
+    </form>
+</body>
+</html>

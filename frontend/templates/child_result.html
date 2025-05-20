@@ -1,0 +1,125 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autism Prediction Result</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgb(72, 223, 249), rgb(30, 240, 212));
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .best-model {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .suggestion-text {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            text-align: justify;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Autism Prediction Result</h2>
+        {% if result.get("error") %}
+        <div class="result" style="color: red">Error: {{ result["error"] }}</div>
+        {% else %}
+        <div class="result">
+            Prediction: <span id="prediction">{{ result["final_prediction"] }}</span>
+        </div>
+        <h3>Model Predictions:</h3>
+        <ul>
+            {% for model, pred in result.get("results", {}).items() %}
+            <li>{{ model }}: {{ "Autistic" if pred == 1 else "Not Autistic" }}</li>
+            {% endfor %}
+        </ul>
+        <div class="best-model">
+            Best Model: {{ result.get("best_model", "N/A") }}
+        </div>
+
+        <!-- Suggestion Button (Initially Hidden) -->
+        <button id="suggestionBtn" class="button hidden" onclick="showSuggestion()">
+            Suggestion
+        </button>
+
+        <!-- Suggestion Text (Justified) -->
+        <div id="suggestionText" class="suggestion-text">
+            <p>1. <strong>Behavioral Therapy:</strong> Helps individuals understand emotions and respond to social situations effectively.</p>
+            <p>2. <strong>Speech & Social Skills Training:</strong> Uses role-playing and social stories to improve interaction and communication.</p>
+            <p>3. <strong>Occupational Therapy for Daily Living Skills:</strong> Assists with essential tasks like dressing, handwriting, and coordination.</p>
+            <p>4. <strong>Reducing Anxiety & Meltdowns:</strong> Encourages maintaining routines and using calming techniques to prevent stress.</p>
+            <p>5. <strong>Encouraging Independence & Interests:</strong> Supports engagement in special interests, organizing personal spaces, and developing life skills.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <br />
+    <center>
+        <button onclick="window.location.href='/three';" class="button">Back</button>
+    </center>
+
+    <script>
+        // Function to display suggestion text
+        function showSuggestion() {
+            document.getElementById("suggestionText").style.display = "block";
+        }
+
+        // Enable Suggestion Button if Prediction is Autistic
+        window.onload = function () {
+            let predictionText = document.getElementById("prediction").innerText.trim();
+            let suggestionBtn = document.getElementById("suggestionBtn");
+
+            if (predictionText.toLowerCase() === "autistic") {
+                suggestionBtn.classList.remove("hidden");
+            }
+        };
+    </script>
+</body>
+</html>

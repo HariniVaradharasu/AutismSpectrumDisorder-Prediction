@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autism Detection Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background: linear-gradient(to right, rgb(145, 234, 239), rgb(250, 138, 226));
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .result {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .best-model {
+            font-size: 20px;
+            font-weight: bold;
+            color: #5cb85c;
+        }
+        .button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: darkgreen;
+        }
+        .suggestion-text {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            text-align: justify;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Autism Detection Result</h1>
+        <p class="result"><strong>Diagnosis:</strong> <span id="diagnosis">{{ result }}</span></p>
+        <p class="best-model"><strong>Best Model:</strong> {{ best_model }}</p>
+        <p><strong>Model Predictions:</strong> <br>
+            <ul>
+                <li>Decision Tree: {{ predictions[0] }}</li>
+                <li>Random Forest: {{ predictions[1] }}</li>
+                <li>XGBoost: {{ predictions[2] }}</li>
+            </ul>
+        </p>
+
+        <!-- Suggestion Button -->
+        <button id="suggestionBtn" class="button" onclick="toggleSuggestion()">Suggestion</button>
+
+        <!-- Suggestion Text -->
+        <div id="suggestionText" class="suggestion-text">
+            <p>1. <strong>Social Communication Therapy:</strong> Focuses on non-verbal cues such as facial expressions, tone of voice, and body language.</p>
+            <p>2. <strong>Emotional Regulation & Mental Health:</strong> Practice mindfulness and meditation to improve mental well-being.</p>
+            <p>3. <strong>Build Daily Life & Work Skills:</strong> Develop essential skills like budgeting and time management for greater independence.</p>
+            <p>4. <strong>Support Groups & Social Interaction:</strong> Join autism support groups or online communities to build connections.</p>
+            <p>5. <strong>Encourage Healthy Lifestyle Habits:</strong> Maintain a consistent sleep schedule, healthy eating, and regular exercise.</p>
+        </div>
+    </div>
+    
+    <br>
+    <center>
+        <button onclick="window.location.href='/three';" class="button">Back</button>
+    </center>
+
+    <script>
+        function toggleSuggestion() {
+            let suggestionText = document.getElementById("suggestionText");
+            suggestionText.style.display = (suggestionText.style.display === "none" || suggestionText.style.display === "") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>

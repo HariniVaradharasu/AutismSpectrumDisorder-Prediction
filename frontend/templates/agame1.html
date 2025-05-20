@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: rgb(9, 222, 233);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        .hidden {
+            display: none;
+        }
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 40px);
+            grid-template-rows: repeat(9, 40px);
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+        .sudoku-cell {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .start-btn {
+            background-color: blue;
+            color: white;
+        }
+        .check-btn {
+            background-color: green;
+            color: white;
+        }
+        .reset-btn {
+            background-color: red;
+            color: white;
+        }
+        .back-btn {
+            background-color: orange;
+            color: white;
+        }
+        .pause-btn {
+            background-color: purple;
+            color: white;
+        }
+        .timer {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .back-btn-top {
+            background-color: green;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sudoku Game</h1>
+    <div id="intro-container" class="container">
+        <h2>Welcome to Sudoku!</h2>
+        <p><strong>How to Play:</strong></p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>Fill the 9×9 grid so that each row, column, and 3×3 section contain numbers from 1 to 9.</li>
+            <li>Some numbers are pre-filled; do not change them.</li>
+            <li>Check your solution with the "Check Solution" button.</li>
+            <li>Use the "Reset Board" button to start over.</li>
+            <li>Click "Pause" to stop the timer, and "Resume" to continue.</li>
+        </ul><br>
+        <button class="button start-btn" onclick="startGame()">Start Game</button>
+    </div>
+
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-btn-top">🔙 Back</button>
+    </div>
+
+    <div id="game-container" class="container hidden">
+        <div class="timer" id="timer">Time: 00:00</div>
+        <div class="sudoku-grid" id="sudoku-grid"></div>
+        <button class="button check-btn" onclick="checkSolution()">Check Solution</button>
+        <button class="button reset-btn" onclick="resetBoard()">Reset Board</button>
+        <button class="button pause-btn" id="pause-btn" onclick="togglePause()">Pause</button>
+    </div>
+
+    <script>
+        const initialBoard = [
+            [5, 3, null, null, 7, null, null, null, null],
+            [6, null, null, 1, 9, 5, null, null, null],
+            [null, 9, 8, null, null, null, null, 6, null],
+            [8, null, null, null, 6, null, null, null, 3],
+            [4, null, null, 8, null, 3, null, null, 1],
+            [7, null, null, null, 2, null, null, null, 6],
+            [null, 6, null, null, null, null, 2, 8, null],
+            [null, null, null, 4, 1, 9, null, null, 5],
+            [null, null, null, null, 8, null, null, 7, 9]
+        ];
+
+        const solutionBoard = [
+            [5, 3, 4, 6, 7, 8, 9, 1, 2],
+            [6, 7, 2, 1, 9, 5, 3, 4, 8],
+            [1, 9, 8, 3, 4, 2, 5, 6, 7],
+            [8, 5, 9, 7, 6, 1, 4, 2, 3],
+            [4, 2, 6, 8, 5, 3, 7, 9, 1],
+            [7, 1, 3, 9, 2, 4, 8, 5, 6],
+            [9, 6, 1, 5, 3, 7, 2, 8, 4],
+            [2, 8, 7, 4, 1, 9, 6, 3, 5],
+            [3, 4, 5, 2, 8, 6, 1, 7, 9]
+        ];
+
+        let timerInterval;
+        let seconds = 0;
+        let isPaused = false;
+
+        function startGame() {
+            document.getElementById("intro-container").classList.add("hidden");
+            document.getElementById("game-container").classList.remove("hidden");
+            createBoard();
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    seconds++;
+                    const minutes = Math.floor(seconds / 60);
+                    const displaySeconds = seconds % 60;
+                    document.getElementById('timer').innerText = `Time: ${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function createBoard() {
+            const grid = document.getElementById('sudoku-grid');
+            grid.innerHTML = '';
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.createElement('input');
+                    cell.type = 'text';
+                    cell.maxLength = 1;
+                    cell.classList.add('sudoku-cell');
+                    if (initialBoard[row][col] !== null) {
+                        cell.value = initialBoard[row][col];
+                        cell.disabled = true;
+                    } else {
+                        cell.value = '';
+                        cell.addEventListener('input', () => validateCell(cell, row, col));
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function validateCell(cell, row, col) {
+            const value = parseInt(cell.value);
+            if (value === solutionBoard[row][col]) {
+                cell.style.color = "green";
+            } else {
+                cell.style.color = "red";
+            }
+        }
+
+        function checkSolution() {
+            document.querySelectorAll('.sudoku-cell').forEach((cell, index) => {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                cell.value = solutionBoard[row][col];
+                cell.style.color = "green";
+            });
+        }
+
+        function resetBoard() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            document.getElementById('timer').innerText = 'Time: 00:00';
+            createBoard();
+            startTimer();
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pause-btn').innerText = isPaused ? "Resume" : "Pause";
+        }
+
+        function goBack() {
+            window.history.back(); // Navigate to the previous page in history
+        }
+    </script>
+</body>
+</html>

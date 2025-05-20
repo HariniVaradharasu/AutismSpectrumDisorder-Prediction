@@ -1,0 +1,290 @@
+<!-- templates/adult_qn.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Autism Assessment</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg,rgb(191, 97, 246),rgb(21, 168, 247));
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.68);
+            text-align: left;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #ff7f50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #ff6347;
+        }
+    </style>
+</head>
+<body>
+    <h1>Adult Autism Assessment</h1>
+    <form method="POST" action="/predicta">
+        <div class="container">
+            
+    
+            <div class="form-group">
+                <label>A1: I often hear small sounds others do not.</label>
+                <select name="A1_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A2: I usually concentrate more on the whole picture rather than the small details.</label>
+                <select name="A2_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A3: I find it easy to do more than one thing at once.</label>
+                <select name="A3_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A4: If there is an interruption, I can switch back to what I was doing very quickly.</label>
+                <select name="A4_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A5: I find it easy to "read between the lines" when someone is talking to me.</label>
+                <select name="A5_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A6: I know how to tell if someone listening to me is getting bored.</label>
+                <select name="A6_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A7: When I'm reading a story I find it difficult to work out the characters’ intentions.</label>
+                <select name="A7_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A8: I like to collect information about categories of things (e.g., types of car, types of bird, types of train, types of plant).</label>
+                <select name="A8_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A9: I find it easy to work out what someone is thinking or feeling just by looking at their face.</label>
+                <select name="A9_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>A10: I find it difficult to work out people's intentions.</label>
+                <select name="A10_score" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Age:</label>
+                <input type="number" name="Age" required>
+            </div>
+
+            <div class="form-group">
+                <label>Gender:</label>
+                <select name="Gender" required>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Ethnicity">Ethnicity:</label>
+        <select name="Ethnicity" required>
+            <option value="49">Spain</option>
+            <option value="9">White-European</option>
+            <option value="3">Latino</option>
+            <option value="5">Others</option>
+            <option value="1">Black</option>
+            <option value="0">Asian</option>
+            <option value="4">Middle Eastern</option>
+            <option value="6">Pasifika</option>
+            <option value="7">South Asian</option>
+            <option value="2">Hispanic</option>
+            <option value="8">Turkish</option>
+            <option value="10">Others</option>
+        </select><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>Jaundice:</label>
+                <select name="jundice" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country:</label>
+        <select name="country" required>
+            <option value="57">United States</option>
+            <option value="11">Brazil</option>
+            <option value="49">Spain</option>
+            <option value="36">New Zealand</option>
+            <option value="7">Bahamas</option>
+            <option value="12">Burundi</option>
+            <option value="31">Jordan</option>
+            <option value="29">Ireland</option>
+            <option value="55">United Arab Emirates</option>
+            <option value="0">Afghanistan</option>
+            <option value="56">United Kingdom</option>
+            <option value="48">South Africa</option>
+            <option value="30">Italy</option>
+            <option value="40">Pakistan</option>
+            <option value="20">Egypt</option>
+            <option value="8">Bangladesh</option>
+            <option value="14">Chile</option>
+            <option value="23">France</option>
+            <option value="15">China</option>
+            <option value="5">Australia</option>
+            <option value="13">Canada</option>
+            <option value="45">Saudi Arabia</option>
+            <option value="35">Netherlands</option>
+            <option value="43">Romania</option>
+            <option value="51">Sweden</option>
+            <option value="52">Tonga</option>
+            <option value="39">Oman</option>
+            <option value="26">India</option>
+            <option value="41">Philippines</option>
+            <option value="50">Sri Lanka</option>
+            <option value="47">Sierra Leone</option>
+            <option value="21">Ethiopia</option>
+            <option value="59">Viet Nam</option>
+            <option value="28">Iran</option>
+            <option value="16">Costa Rica</option>
+            <option value="24">Germany</option>
+            <option value="33">Mexico</option>
+            <option value="3">Armenia</option>
+            <option value="25">Iceland</option>
+            <option value="37">Nicaragua</option>
+            <option value="6">Austria</option>
+            <option value="44">Russia</option>
+            <option value="1">American Samoa</option>
+            <option value="58">Uruguay</option>
+            <option value="54">Ukraine</option>
+            <option value="46">Serbia</option>
+            <option value="42">Portugal</option>
+            <option value="32">Malaysia</option>
+            <option value="19">Ecuador</option>
+            <option value="38">Niger</option>
+            <option value="9">Belgium</option>
+            <option value="10">Bolivia</option>
+            <option value="4">Aruba</option>
+            <option value="22">Finland</option>
+            <option value="53">Turkey</option>
+            <option value="34">Nepal</option>
+            <option value="27">Indonesia</option>
+            <option value="2">Angola</option>
+            <option value="18">Czech Republic</option>
+            <option value="17">Cyprus</option>
+      </select><br><br>
+            </div>
+
+            <div class="form-group">
+                <label>Used App Before:</label>
+                <select name="Used_app_before" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Ade_desc">Age Description:</label>
+                <select name="Ade_desc" required>
+                    <option value="0">18 and more</option>
+                </select><br><br>
+        
+            </div>
+
+            <div class="form-group">
+                <label for="Relation">Relation:</label>
+                <select name="Relation" required>
+                    <option value="0">Self</option>
+                    <option value="1">Parent-1</option>
+                    <option value="2">Health care professional-2</option>
+                    <option value="3">Relative-3</option>
+                    <option value="4">Others-4</option>
+                </select><br><br>
+            </div>
+            <div class="form-group">
+                <label for="Result">Result:</label>
+            <input type="number" id="Result" name="Result" required><br>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="history.back()" style="margin-top: 10px; background:rgba(23, 41, 234, 0.57);">Back</button>
+
+        </div>
+    </form>
+</body>
+</html>
